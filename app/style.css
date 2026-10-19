@@ -1,0 +1,108 @@
+/* Fund Explained: one small stylesheet. Light by default, dark follows the system setting. */
+:root {
+  --fx-card: #FFFFFF; --fx-border: #E2E8F0; --fx-text: #0F172A; --fx-muted: #64748B;
+  --fx-indigo: #4F46E5; --fx-indigo-soft: #EEF2FF;
+  --fx-up: #047857; --fx-down: #B91C1C;
+  --fx-amber-bg: #FEF3C7; --fx-amber-line: #F59E0B; --fx-amber-text: #78350F;
+  --fx-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 6px 20px rgba(15, 23, 42, .06);
+  --fx-low: #D1FAE5; --fx-low-t: #065F46; --fx-mod: #E0F2FE; --fx-mod-t: #075985;
+  --fx-high: #FEF3C7; --fx-high-t: #92400E; --fx-vhigh: #FEE2E2; --fx-vhigh-t: #991B1B;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fx-card: #111827; --fx-border: #1F2937; --fx-text: #E2E8F0; --fx-muted: #94A3B8;
+    --fx-indigo: #A5B4FC; --fx-indigo-soft: #1E1B4B;
+    --fx-up: #34D399; --fx-down: #F87171;
+    --fx-amber-bg: #451A03; --fx-amber-line: #F59E0B; --fx-amber-text: #FDE68A;
+    --fx-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 20px rgba(0, 0, 0, .25);
+    --fx-low: #064E3B; --fx-low-t: #A7F3D0; --fx-mod: #0C4A6E; --fx-mod-t: #BAE6FD;
+    --fx-high: #78350F; --fx-high-t: #FDE68A; --fx-vhigh: #7F1D1D; --fx-vhigh-t: #FECACA;
+  }
+}
+
+/* Layout: comfortable width, hide Streamlit chrome. */
+[data-testid="stMainBlockContainer"], .block-container {
+  max-width: 1100px; padding-top: 2.5rem; padding-bottom: 3rem;
+}
+#MainMenu, [data-testid="stMainMenu"], footer, [data-testid="stStatusWidget"] { visibility: hidden; }
+
+/* Cards */
+.fx-card {
+  background: var(--fx-card); border: 1px solid var(--fx-border); border-radius: 16px;
+  box-shadow: var(--fx-shadow); padding: 20px; margin: 0 0 16px 0; color: var(--fx-text);
+}
+.fx-card p:last-child { margin-bottom: 0; }
+
+/* Hero */
+.fx-hero h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 6px 0; padding: 0; }
+.fx-hero .fx-sub { color: var(--fx-muted); margin: 0 0 12px 0; }
+.fx-hero .fx-asof { color: var(--fx-muted); font-size: .85rem; margin-top: 10px; }
+.fx-hero.fx-landing h1 { font-size: 2.2rem; }
+
+/* Chips */
+.fx-chip {
+  display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: .8rem;
+  font-weight: 600; margin: 0 6px 6px 0; background: var(--fx-indigo-soft); color: var(--fx-indigo);
+}
+.fx-chip.fx-Low { background: var(--fx-low); color: var(--fx-low-t); }
+.fx-chip.fx-Moderate { background: var(--fx-mod); color: var(--fx-mod-t); }
+.fx-chip.fx-High { background: var(--fx-high); color: var(--fx-high-t); }
+.fx-chip.fx-VeryHigh { background: var(--fx-vhigh); color: var(--fx-vhigh-t); }
+
+/* Stat tiles: a responsive grid, so phones get 1-2 per row */
+.fx-tiles {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px; margin: 4px 0 12px 0;
+}
+.fx-tile {
+  background: var(--fx-card); border: 1px solid var(--fx-border); border-radius: 16px;
+  box-shadow: var(--fx-shadow); padding: 16px 18px; color: var(--fx-text);
+}
+.fx-tile .fx-label {
+  color: var(--fx-muted); font-size: .78rem; font-weight: 600; letter-spacing: .02em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.fx-tile .fx-label .fx-i { cursor: help; opacity: .7; text-transform: none; }
+.fx-tile .fx-value { font-size: 1.6rem; font-weight: 700; line-height: 1.2; }
+.fx-tile .fx-note { color: var(--fx-muted); font-size: .85rem; margin-top: 4px; }
+.fx-delta { font-size: .85rem; font-weight: 600; margin-top: 4px; }
+.fx-delta.fx-up { color: var(--fx-up); }
+.fx-delta.fx-down { color: var(--fx-down); }
+
+/* Demo banner */
+.fx-banner {
+  background: var(--fx-amber-bg); color: var(--fx-amber-text); border: 2px solid var(--fx-amber-line);
+  border-radius: 16px; padding: 16px 20px; font-size: 1.05rem; font-weight: 600; margin-bottom: 20px;
+}
+
+/* Label-check callout */
+.fx-flag { border-left: 6px solid var(--fx-amber-line); }
+.fx-ok { border-left: 6px solid var(--fx-indigo); }
+
+/* How it works */
+.fx-how {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;
+}
+.fx-how .fx-card { margin: 0; }
+.fx-how .fx-step { font-size: 1.6rem; margin-bottom: 6px; }
+.fx-how h4 { margin: 0 0 6px 0; padding: 0; }
+.fx-how p { color: var(--fx-muted); margin: 0; }
+
+/* Footer */
+.fx-footer {
+  color: var(--fx-muted); font-size: .8rem; text-align: center; border-top: 1px solid var(--fx-border);
+  margin-top: 40px; padding-top: 16px;
+}
+
+/* Phones */
+@media (max-width: 640px) {
+  [data-testid="stMainBlockContainer"], .block-container { padding: 3.5rem 1rem 2rem 1rem; }
+  .fx-hero h1, .fx-hero.fx-landing h1 { font-size: 1.45rem; }
+  .fx-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .fx-tile { padding: 12px 14px; }
+  .fx-tile .fx-value { font-size: 1.25rem; }
+  .fx-tiles.fx-compact { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .fx-compact .fx-tile { padding: 10px; }
+  .fx-compact .fx-label { font-size: .68rem; }
+  .fx-banner { font-size: .95rem; padding: 12px 14px; }
+}
