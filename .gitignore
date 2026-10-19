@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.streamlit/secrets.toml
+
+# Raw per-scheme JSON cache from scripts/fetch_navs.py (large; the cleaned data/schemes.csv and
+# data/navs.parquet ARE committed).
+data/raw/
