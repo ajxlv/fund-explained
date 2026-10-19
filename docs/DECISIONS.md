@@ -14,3 +14,12 @@ Choices made during the overnight build without being able to ask. Each one take
 5. **Trading calendar = the union of all dates in the dataset.** There is no external holiday calendar, so a "trading day" is any date on which at least one fund has a NAV.
 6. **Forward-fill only interior gaps of 5 trading days or fewer** (`fundx.data.ffill_short_gaps`). Longer gaps stay fully NaN. Plain `ffill(limit=5)` would partly fill a long gap, so it isn't used. Nothing is filled before a fund's first NAV or after its last.
 7. **Daily returns are NaN when either day's NAV is missing.** After a long gap, the return that spans the gap is dropped rather than spread across the missing days.
+
+## Metrics
+
+8. **Recovery time is measured from the trough**, in calendar days until the NAV first gets back to the previous peak. The app shows it in months (days / 30.44).
+9. **The drawdown window** starts at the same point as growth/CAGR: the last NAV on or before (latest date − 5 years). With less history than that, it returns None.
+10. **Beta, correlation and tracking error need at least 20 paired daily returns** (`min_obs`) and use only dates where both the fund and the benchmark have a return.
+11. **29 February anniversaries** follow the pandas `DateOffset` convention: 29 Feb 2020 + 1 year = 28 Feb 2021.
+12. **The Nifty 50 proxy** matches `nifty\s*50` not followed by a digit, so "Nifty 500" is excluded. The rule also requires "index" in the category, Direct + Growth in the name, and none of next/equal/value/momentum/quality/low vol. Longest history means the earliest `first_date`, with the NAV count as the tie-break. The Direct+Growth check is a small copy of the one in `scripts/fetch_navs.py`, which must not be edited or imported as a package.
+13. **Indian rupee formatting** (`fundx.fmt.fmt_inr`) lives in the package, not the app, so it can be tested without Streamlit.
