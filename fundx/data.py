@@ -9,12 +9,14 @@ import argparse
 from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REAL_DIR = REPO_ROOT / "data"
 DEMO_DIR = REPO_ROOT / "data" / "demo"
 MAX_FILL_GAP = 5  # trading days; longer gaps stay missing
+MIN_SHARE_PUBLISHING = 0.5  # a date is a trading day if >= half of the live funds have a NAV
 LONG_GAP = 10  # trading days; reported in DATA_SUMMARY.md
 
 
@@ -66,14 +68,38 @@ def ffill_short_gaps(df: pd.DataFrame, max_gap: int = MAX_FILL_GAP) -> pd.DataFr
     return df.apply(fill)
 
 
-def nav_matrix(navs: pd.DataFrame, max_gap: int = MAX_FILL_GAP) -> pd.DataFrame:
-    """Dates x scheme_code NAV matrix on the union of all trading dates in the data."""
+def trading_days(navs: pd.DataFrame, min_share: float = MIN_SHARE_PUBLISHING) -> pd.DatetimeIndex:
+    """Dates on which at least `min_share` of the funds alive that day published a NAV.
+
+    This drops stray dates (e.g. one fund reporting a NAV on a holiday), which would otherwise
+    leave every other fund with a hole in its returns.
+    """
+    per_fund = navs.groupby("scheme_code")["date"].agg(["min", "max"])
+    dates = pd.DatetimeIndex(sorted(navs["date"].unique()))
+    started = np.searchsorted(np.sort(per_fund["min"].to_numpy()), dates.to_numpy(), side="right")
+    ended = np.searchsorted(np.sort(per_fund["max"].to_numpy()), dates.to_numpy(), side="left")
+    alive = started - ended
+    published = navs.groupby("date")["scheme_code"].nunique().reindex(dates).to_numpy()
+    return dates[published >= min_share * alive]
+
+
+def raw_matrix(navs: pd.DataFrame) -> pd.DataFrame:
+    """Dates x scheme_code NAV matrix on the trading-day calendar, gaps left as NaN."""
     wide = navs.pivot_table(index="date", columns="scheme_code", values="nav", aggfunc="last")
-    return ffill_short_gaps(wide.sort_index(), max_gap)
+    return wide.reindex(trading_days(navs))
+
+
+def nav_matrix(navs: pd.DataFrame, max_gap: int = MAX_FILL_GAP) -> pd.DataFrame:
+    """Aligned NAV matrix with interior gaps of up to `max_gap` trading days forward-filled."""
+    return ffill_short_gaps(raw_matrix(navs), max_gap)
 
 
 def daily_returns(matrix: pd.DataFrame) -> pd.DataFrame:
-    """Simple daily returns. A return is NaN whenever either day's NAV is missing."""
+    """Simple daily returns. A return is NaN whenever either day's NAV is missing.
+
+    Pass the *unfilled* matrix: a forward-filled day would show a fake 0% return followed by a
+    two-day jump, which distorts volatility, beta and correlations.
+    """
     return matrix.pct_change(fill_method=None)
 
 
@@ -81,8 +107,8 @@ def daily_returns(matrix: pd.DataFrame) -> pd.DataFrame:
 class Dataset:
     schemes: pd.DataFrame
     navs: pd.DataFrame
-    matrix: pd.DataFrame
-    returns: pd.DataFrame
+    matrix: pd.DataFrame  # aligned NAVs, short gaps forward-filled (for NAV-level metrics, charts)
+    returns: pd.DataFrame  # daily returns from the unfilled NAVs (for risk, beta, correlations)
     data_dir: Path
     is_demo: bool
 
@@ -96,20 +122,21 @@ def load_dataset() -> Dataset:
     schemes = load_schemes(data_dir)
     navs = load_navs(data_dir)
     navs = navs[navs["scheme_code"].isin(schemes["scheme_code"])]
-    matrix = nav_matrix(navs)
-    return Dataset(schemes, navs, matrix, daily_returns(matrix), data_dir, is_demo)
+    raw = raw_matrix(navs)
+    matrix = ffill_short_gaps(raw)
+    return Dataset(schemes, navs, matrix, daily_returns(raw), data_dir, is_demo)
 
 
 def longest_gaps(navs: pd.DataFrame) -> pd.Series:
     """Longest run of missing trading days per fund, between its own first and last NAV.
 
-    "Trading days" = the union of all dates present in the dataset.
+    Measured on the `trading_days` calendar (stray non-trading dates are ignored).
     """
-    calendar = pd.DatetimeIndex(sorted(navs["date"].unique()))
+    calendar = trading_days(navs)
     pos = pd.Series(range(len(calendar)), index=calendar)
     out = {}
     for code, g in navs.groupby("scheme_code"):
-        p = pos.loc[g["date"].sort_values()].to_numpy()
+        p = pos.reindex(g["date"].sort_values()).dropna().to_numpy().astype(int)
         out[code] = int((p[1:] - p[:-1] - 1).max()) if len(p) > 1 else 0
     return pd.Series(out, name="longest_gap_days")
 

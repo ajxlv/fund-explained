@@ -23,3 +23,13 @@ Choices made during the overnight build without being able to ask. Each one take
 11. **29 February anniversaries** follow the pandas `DateOffset` convention: 29 Feb 2020 + 1 year = 28 Feb 2021.
 12. **The Nifty 50 proxy** matches `nifty\s*50` not followed by a digit, so "Nifty 500" is excluded. The rule also requires "index" in the category, Direct + Growth in the name, and none of next/equal/value/momentum/quality/low vol. Longest history means the earliest `first_date`, with the NAV count as the tie-break. The Direct+Growth check is a small copy of the one in `scripts/fetch_navs.py`, which must not be edited or imported as a package.
 13. **Indian rupee formatting** (`fundx.fmt.fmt_inr`) lives in the package, not the app, so it can be tested without Streamlit.
+14. **Returns come from the unfilled NAVs; the forward-filled matrix is only for NAV-level numbers and charts.** A forward-filled day gives a fake 0% return followed by a two-day jump, which distorted the correlations noticeably: two demo index funds dropped from 0.9997 to 0.986. Missing days therefore drop their returns instead.
+15. **Trading days exclude stray dates.** A date counts as a trading day only if at least half of the funds alive on that date published a NAV. Otherwise one fund's holiday NAV would leave a hole in every other fund's returns.
+
+## ML
+
+16. **Funds with any missing feature are left out of the ML** (clustering and classifier). Missing values are not imputed. The report gives the count used.
+17. **The k for "number of distinct equity categories"** is the number of distinct `scheme_category` values in the universe, index funds included, computed before merging small categories.
+18. **When the merged "Other equity" class still has fewer than 8 funds, its funds are left out of the classifier.** Five-fold stratified CV can't evaluate a class that small. In the demo data this applies to the 3 index funds, and the app tells the user the check couldn't run for those funds.
+19. **Flags use the model with the higher cross-validated macro-F1**, and that choice is logged in the report. "Behaves like Other equity" is never flagged because it isn't a meaningful statement.
+20. **Model settings:** logistic regression is `StandardScaler` + `LogisticRegression(max_iter=5000)`, multinomial by default in scikit-learn 1.9. The random forest has 500 trees. KMeans uses `n_init=10`. Everything uses `random_state=42`.
