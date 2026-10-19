@@ -92,3 +92,7 @@ def test_short_name():
     assert report.short_name("HDFC Flexi Cap Fund - Growth Option - Direct Plan") == \
         "HDFC Flexi Cap Fund"
     assert report.short_name("No Suffix Fund") == "No Suffix Fund"
+
+
+def test_fmt_date_is_portable():
+    assert report.fmt_date("2026-10-06") == "6 Oct 2026"

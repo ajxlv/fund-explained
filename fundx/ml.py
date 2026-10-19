@@ -423,7 +423,8 @@ def main() -> None:
     ap.add_argument("--report", action="store_true", help="write docs/EVALUATION.md")
     args = ap.parse_args()
     if args.report:
-        print(write_report())
+        write_report()
+        print("Wrote docs/EVALUATION.md")
     else:
         ap.print_help()
 

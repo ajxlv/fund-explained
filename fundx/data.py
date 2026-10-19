@@ -193,7 +193,8 @@ def main() -> None:
     ap.add_argument("--summary", action="store_true", help="write docs/DATA_SUMMARY.md")
     args = ap.parse_args()
     if args.summary:
-        print(write_summary())
+        write_summary()
+        print("Wrote docs/DATA_SUMMARY.md")
     else:
         ap.print_help()
 

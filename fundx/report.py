@@ -16,7 +16,9 @@ DAYS_PER_MONTH = 30.44
 
 
 def fmt_date(d) -> str:
-    return pd.Timestamp(d).strftime("%-d %b %Y")
+    """16 Oct 2026. (Not "%-d": that strftime flag doesn't exist on Windows.)"""
+    d = pd.Timestamp(d)
+    return f"{d.day} {d.strftime('%b %Y')}"
 
 
 def category_name(cat: str) -> str:
