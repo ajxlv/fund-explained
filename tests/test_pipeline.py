@@ -5,6 +5,7 @@ from fundx import ml
 from fundx.benchmark import nifty50_index_funds
 from fundx.data import load_dataset
 from fundx.features import FEATURES
+from tests.wording import banned_phrases
 
 
 @pytest.fixture(scope="module")
@@ -32,8 +33,7 @@ def test_benchmark_has_beta_one(analysis):
 def test_report_mentions_data_kind(ds, analysis):
     text = ml.build_report(ds, analysis)
     assert text.startswith("# ⚠️ DEMO DATA, NOT REAL") == ds.is_demo
-    for word in ("buy", "sell", "best fund", "you should"):
-        assert word not in text.lower()
+    assert banned_phrases(text) == []
 
 
 def test_real_data_nifty50_lookalikes_match_each_other(ds, analysis):

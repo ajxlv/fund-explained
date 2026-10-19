@@ -4,8 +4,7 @@ import pytest
 from fundx import ml, report
 from fundx.data import load_dataset
 from fundx.metrics import Drawdown
-
-BANNED = ("buy", "sell", "best fund", "you should")
+from tests.wording import banned_phrases
 
 
 def test_category_noun_articles():
@@ -59,8 +58,7 @@ def test_build_report_for_every_fund_and_wording_is_neutral(setup):
         text = " ".join([r.label_text, report.beta_sentence(r.beta),
                          report.correlation_sentence(r.correlation),
                          report.drawdown_story(r.drawdown)]).lower()
-        for w in BANNED:
-            assert w not in text
+        assert banned_phrases(text) == []
 
 
 def test_flagged_wording(setup):

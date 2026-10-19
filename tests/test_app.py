@@ -6,6 +6,7 @@ from streamlit.testing.v1 import AppTest
 
 from fundx.data import load_dataset
 from fundx.ml import analyse
+from tests.wording import banned_phrases
 
 APP = str(Path(__file__).resolve().parents[1] / "app" / "streamlit_app.py")
 TIMEOUT = 120
@@ -40,8 +41,7 @@ def test_fund_pages_render(codes):
         assert not at.exception, at.exception
         text = " ".join(m.value for m in at.markdown).lower()
         assert "report card" in text
-        for word in ("buy", "sell", "best fund", "you should"):
-            assert word not in text
+        assert banned_phrases(text) == []
 
 
 def test_filters_and_search_do_not_crash(codes):

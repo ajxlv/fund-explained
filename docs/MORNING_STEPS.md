@@ -26,7 +26,7 @@ python scripts\fetch_navs.py --out data
 
 This makes about one request per Direct-Growth candidate scheme, with a polite 0.3 s pause between them, so expect 10 to 30 minutes. If it stops, just run the same command again: finished schemes are cached in `data\raw\`, which git ignores.
 
-When it finishes you should have `data\schemes.csv` and `data\navs.parquet`. The app and tests pick up `data\` over `data\demo\` automatically.
+When it finishes there will be `data\schemes.csv` and `data\navs.parquet`. The app and tests pick up `data\` over `data\demo\` automatically.
 
 ## 3. Regenerate the reports and run the tests
 

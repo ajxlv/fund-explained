@@ -40,7 +40,7 @@ INDEX_CATEGORY = "Other Scheme - Index Funds"
 def simulate_factors(rng: np.random.Generator, n: int) -> dict[str, np.ndarray]:
     # Fat-tailed market (Student-t, df=4) scaled to ~17% annual volatility, ~13% annual drift.
     market = 0.0005 + 0.011 * rng.standard_t(4, n) / np.sqrt(2.0)
-    market[300:340] += -0.004  # one sharp sell-off so drawdowns and recoveries are visible
+    market[300:340] += -0.004  # one sharp crash so drawdowns and recoveries are visible
     return {
         "market": market,
         "size": 0.0001 + 0.006 * rng.standard_normal(n),
