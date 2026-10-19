@@ -29,7 +29,7 @@
 - The skip is the real-data sanity test ("each Nifty 50 index fund's top lookalike is another one, corr ≥ 0.99, for ≥ 90% of them"). It skips with a clear reason on demo data. I checked that it runs and passes when data sits in `data/` by temporarily copying the demo files there, and a separate demo-only test covers the same logic on the 3 synthetic index funds.
 - The metric tests use hand-built series, as asked: √2 − 1 for a 2-year doubling, the 100→120→90→125 drawdown path, beta 1 and 2, and None for too-short history.
 - `tests/test_app.py` runs the real Streamlit app headless (`AppTest`): the landing page, several fund pages and the filters. It caught a real crash during the build.
-- `tests/test_wording.py` scans every code and doc file outside `tests/` for "buy", "sell", "best fund" and "you should". Those words appear only in `tests/wording.py`, which is the guard itself.
+- `tests/test_wording.py` scans every code and doc file outside `tests/` for the four forbidden recommendation phrases from the brief. They are spelled out only in `tests/wording.py`, which is the guard itself.
 - I also checked the app in Chromium (Playwright) at 1280 px and 390 px, in light and dark mode: no exceptions and no horizontal scroll.
 
 ## Key numbers (demo data, so they mean nothing about real funds)
